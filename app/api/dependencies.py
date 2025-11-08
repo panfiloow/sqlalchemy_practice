@@ -1,4 +1,3 @@
-from typing import Annotated
 from fastapi import Depends, HTTPException, Request, status
 from jose import JWTError
 from sqlalchemy.ext.asyncio import AsyncSession

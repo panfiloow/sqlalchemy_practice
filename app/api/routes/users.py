@@ -1,8 +1,6 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database import get_async_session
 from app.schemas.user import UserResponse, CreateUser, UsersListResponse
 from app.services.user_service import UserService
 from app.api.dependencies import get_user_service, get_current_active_user
