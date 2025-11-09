@@ -14,7 +14,6 @@ from app.core.security import (
 from app.repositories.user_repository import UserRepository
 from app.repositories.token_repository import TokenRepository
 from app.models.user import User
-from app.models.refresh_token import RefreshToken
 from app.config import settings
 
 class AuthService:
@@ -143,8 +142,7 @@ class AuthService:
 
     async def verify_refresh_token(self, request) -> User:
         """Verify refresh token and return user"""
-        from fastapi import Request
-        
+    
         refresh_token = request.cookies.get(settings.COOKIE_REFRESH_NAME)
         if not refresh_token:
             raise HTTPException(status_code=401, detail="Refresh token not found")
