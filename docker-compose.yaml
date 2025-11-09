@@ -1,0 +1,44 @@
+services:
+  postgres:  
+    image: postgres:18
+    container_name: fastapi_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    env_file:
+      - .env
+    networks:
+      - fastapi_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: fastapi_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "8080:80"
+    env_file:
+      - .env
+    networks:
+      - fastapi_network
+    depends_on:
+      postgres:  
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+
+networks:
+  fastapi_network:
+    driver: bridge

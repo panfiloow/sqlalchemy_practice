@@ -1,12 +1,18 @@
+from typing import List, Optional
+from pydantic import AnyHttpUrl, computed_field
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    # Database
-    DATABASE_URL: str = "sqlite+aiosqlite:///./test.db"
+    # PostgreSQL Database
+    POSTGRES_DB: str
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_HOST: str = "localhost"
+    POSTGRES_PORT: str = "5432"
     
-    # JWT
-    SECRET_KEY: str = "your-secret-key-change-in-production"
-    REFRESH_SECRET_KEY: str = "your-refresh-secret-key-change-in-production"
+    # JWT Security
+    SECRET_KEY: str
+    REFRESH_SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
@@ -15,10 +21,26 @@ class Settings(BaseSettings):
     COOKIE_ACCESS_NAME: str = "access_token"
     COOKIE_REFRESH_NAME: str = "refresh_token"
     
-    # Security
+    # Application Settings
     DEBUG: bool = False
+    ENVIRONMENT: str = "development"
+    HOST: str = "0.0.0.0"
+    PORT: int = 8000
+    
+    # CORS
+    CORS_ORIGINS: List[AnyHttpUrl] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    
+    # PgAdmin (опционально)
+    PGADMIN_EMAIL: Optional[str] = None
+    PGADMIN_PASSWORD: Optional[str] = None
+    
+    @computed_field
+    @property
+    def DATABASE_URL(self) -> str:
+        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
     
     class Config:
         env_file = ".env"
+        case_sensitive = True
 
 settings = Settings()
