@@ -1,4 +1,5 @@
-from typing import List, Optional
+import json
+from typing import List, Optional, Union
 from pydantic import AnyHttpUrl, computed_field
 from pydantic_settings import BaseSettings
 
@@ -28,7 +29,7 @@ class Settings(BaseSettings):
     PORT: int = 8000
     
     # CORS
-    CORS_ORIGINS: List[AnyHttpUrl] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    CORS_ORIGINS: str
     
     # PgAdmin (опционально)
     PGADMIN_EMAIL: Optional[str] = None
@@ -39,6 +40,19 @@ class Settings(BaseSettings):
     def DATABASE_URL(self) -> str:
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
     
+
+    @computed_field
+    @property
+    def cors_origins_list(self) -> List[Union[str, AnyHttpUrl]]:
+        """Парсим JSON строку в список origins"""
+        try:
+            origins = json.loads(self.CORS_ORIGINS)
+            return [str(origin) for origin in origins]
+        except json.JSONDecodeError:
+            # Если JSON невалидный, возвращаем пустой список
+            return []
+
+
     class Config:
         env_file = ".env"
         case_sensitive = True
