@@ -16,6 +16,7 @@ from app.repositories.token_repository import TokenRepository
 from app.models.user import User
 from app.config import settings
 
+#TODO: OAUTH2
 class AuthService:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
